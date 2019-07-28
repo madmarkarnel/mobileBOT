@@ -84,43 +84,25 @@ void JoystickEvents::OnHatSwitch(uint8_t hat)
         Serial.println(hat);
         Serial.println("");
 
-        // switch (hat)
-        // {
-        // case(0):
-        //         valueRead = 0;
-        //         break;
-        
-        // default:
-        //         break;
-        // }
-
         if (hat == 0)
         {
                 Serial.println("Forward!");
                 valueRead = 0;
-                // delay(1000);
-                // valueRead = 8;
         }
         else if (hat == 4)
         {
                 Serial.println("Reverse!");
                 valueRead = 4;
-                // delay(1000);
-                // valueRead = 8;
-        }
+        }        
         else if (hat == 6)
         {
                 Serial.println("Left!");
                 valueRead = 6;
-                // delay(10);
-                // valueRead = 8;
         }
         else if (hat == 2)
         {
                 Serial.println("Right!");
                 valueRead = 2;
-                // delay(10);
-                // valueRead = 8;
         }
         else
         {
@@ -133,10 +115,36 @@ void JoystickEvents::OnButtonUp(uint8_t but_id)
 {
         Serial.print("Up: ");
         Serial.println(but_id, DEC);
+
+        if(but_id == 2)
+        {
+                Serial.println(" DNNNN Shooting motor ON!");
+                mtrshoot = 0;
+        }
+        else if (but_id == 3)
+        {
+                Serial.println(" DNNNN Shooting motor OFF!");
+                mtrshoot = 0;
+        }        
 }
 
 void JoystickEvents::OnButtonDn(uint8_t but_id)
 {
         Serial.print("Dn: ");
         Serial.println(but_id, DEC);
+
+        if(but_id == 2)
+        {
+                Serial.println("Shooting motor ON!");
+                mtrshoot = 2;
+        }
+        else if (but_id == 3)
+        {
+                Serial.println("Shooting motor OFF!");
+                mtrshoot = 3;
+        }
+        else
+        {
+                mtrshoot = 0;
+        }
 }

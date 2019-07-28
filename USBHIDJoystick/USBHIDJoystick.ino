@@ -3,9 +3,9 @@
 #include <usbhub.h>
 
 // Satisfy IDE, which only needs to see the include statment in the ino.
-// #ifdef dobogusinclude
-// #include <spi4teensy3.h>
-// #endif
+#ifdef dobogusinclude
+#include <spi4teensy3.h>
+#endif
 
 #include <SPI.h>
 
@@ -29,11 +29,16 @@ JoystickReportParser Joy(&JoyEvents);
 #define SPDLEFTRIGHT 500 //stable at 60
 
 /*  VNH2SP30 pin definitions
- xxx[0] controls '1' outputs
+ xxx[0] controls '1' outputs 
  xxx[1] controls '2' outputs */
 int inApin[2] = {7, 4}; // INA: Clockwise input
 int inBpin[2] = {8, 3}; // INB: Counter-clockwise input  9=3,pinalitan lang,default:9
 int pwmpin[2] = {5, 6}; // PWM input
+
+int mtrShotA[2] = {14, 15};   // [7,4] - motor shield (shooter motor A clockwise)
+int mtrShotB[2] = {16, 17};   // [8,9] - motor shield (shooter motor B counter-clockwise)
+int pwmShot[2] = {18,19};     // [5,6] - motor shield (pwm input shooter)
+
 int cspin[2] = {2, 3};  // CS: Current sense ANALOG input
 int enpin[2] = {0, 1};  // EN: Status of switches output (Analog pin)
 
@@ -51,20 +56,20 @@ void setup()
     pinMode(inApin[i], OUTPUT);
     pinMode(inBpin[i], OUTPUT);
     pinMode(pwmpin[i], OUTPUT);
+    //shooter variables
+    pinMode(mtrShotA[i], OUTPUT);
+    pinMode(mtrShotB[i], OUTPUT);
+    pinMode(pwmShot[i], OUTPUT);
   }
   // Initialize braked
   for (int i = 0; i < 2; i++)
   {
     digitalWrite(inApin[i], LOW);
     digitalWrite(inBpin[i], LOW);
+    //shooter variables
+    digitalWrite(mtrShotA[i], LOW);
+    digitalWrite(mtrShotB[i], LOW);
   }
-
-// #if !defined(__MIPSEL__)
-//   while (!Serial)
-//     ; // Wait for serial port to connect - used on Leonardo, Teensy and other boards with built-in USB CDC serial connection
-// #endif
-
-  Serial.println("Start");
 
   if (Usb.Init() == -1)
     Serial.println("OSC did not start.");
@@ -101,11 +106,21 @@ void loop()
       Serial.println("Right!");
       right_RIGHT();
     }
+    else if (JoyEvents.mtrshoot == 2)
+    {
+      Serial.println("Start shooting!");
+      launcher_up();
+    }
+    else if (JoyEvents.mtrshoot == 3)
+    {
+      Serial.println("Stop motor shoot!");
+      shooterMotorOff(18);
+      shooterMotorOff(19);
+    }
     else
     {
       break_bot();
     }
-    
 }
 
 void left_LEFT()
@@ -124,18 +139,16 @@ void right_RIGHT()
 
 void launcher_up()
 {
-  motorGo(0, 1, MTRSPEED);
-  motorGo(1, 2, MTRSPEED);
-  Serial.println("Forward!");
-  delay(2);
+  shootMotorGo(0, 1, MTRSPEED);
+  shootMotorGo(1, 2, MTRSPEED);
+  Serial.println("Shooter forward!");
 }
 
 void launcher_down()
 {
-  motorGo(0, 2, MTRSPEED);
-  motorGo(1, 1, MTRSPEED);
-  Serial.println("Reverse!");
-  delay(2);
+  shootMotorGo(0, 2, MTRSPEED);
+  shootMotorGo(1, 1, MTRSPEED);
+  Serial.println("Shooter reverse!");
 }
 
 void forward_up()
@@ -167,6 +180,17 @@ void motorOff(int motor)
     digitalWrite(inBpin[i], LOW);
   }
   analogWrite(pwmpin[motor], 0);
+}
+
+void shooterMotorOff(int motor)
+{
+  // Initialize braked shooter motor
+  for (int i = 0; i < 2; i++)
+  {
+    digitalWrite(mtrShotA[i], LOW);
+    digitalWrite(mtrShotB[i], LOW);
+  }
+  analogWrite(pwmShot[motor], 0);
 }
 
 /* motorGo() will set a motor going in a specific direction
@@ -207,6 +231,30 @@ void motorGo(uint8_t motor, uint8_t direct, uint8_t pwm)
     }
   }
 }
+
+void shootMotorGo(uint8_t motor, uint8_t direct, uint8_t pwm)
+{
+  if (motor <= 1)
+  {
+    if (direct <= 4)
+    {
+      // Set inA[motor]
+      if (direct <= 1)
+        digitalWrite(mtrShotA[motor], HIGH);
+      else
+        digitalWrite(mtrShotA[motor], LOW);
+
+      // Set inB[motor]
+      if ((direct == 0) || (direct == 2))
+        digitalWrite(mtrShotB[motor], HIGH);
+      else
+        digitalWrite(mtrShotB[motor], LOW);
+
+      analogWrite(pwmShot[motor], pwm);
+    }
+  }
+}
+
 
 #define ATCMD     "AT"
 #define ATECMDTRUE  "ATE"
