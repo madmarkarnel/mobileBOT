@@ -1,34 +1,39 @@
 #include "hidjoystickrptparser.h"
 
-JoystickReportParser::JoystickReportParser(JoystickEvents *evt) :
-joyEvents(evt),
-oldHat(0xDE),
-oldButtons(0) {
+JoystickReportParser::JoystickReportParser(JoystickEvents *evt) : joyEvents(evt),
+                                                                  oldHat(0xDE),
+                                                                  oldButtons(0)
+{
         for (uint8_t i = 0; i < RPT_GEMEPAD_LEN; i++)
                 oldPad[i] = 0xD;
 }
 
-void JoystickReportParser::Parse(USBHID *hid, bool is_rpt_id, uint8_t len, uint8_t *buf) {
+void JoystickReportParser::Parse(USBHID *hid, bool is_rpt_id, uint8_t len, uint8_t *buf)
+{
         bool match = true;
 
         // Checking if there are changes in report since the method was last called
         for (uint8_t i = 0; i < RPT_GEMEPAD_LEN; i++)
-                if (buf[i] != oldPad[i]) {
+                if (buf[i] != oldPad[i])
+                {
                         match = false;
                         break;
                 }
 
         // Calling Game Pad event handler
-        if (!match && joyEvents) {
-                joyEvents->OnGamePadChanged((const GamePadEventData*)buf);
+        if (!match && joyEvents)
+        {
+                joyEvents->OnGamePadChanged((const GamePadEventData *)buf);
 
-                for (uint8_t i = 0; i < RPT_GEMEPAD_LEN; i++) oldPad[i] = buf[i];
+                for (uint8_t i = 0; i < RPT_GEMEPAD_LEN; i++)
+                        oldPad[i] = buf[i];
         }
 
         uint8_t hat = (buf[5] & 0xF);
 
         // Calling Hat Switch event handler
-        if (hat != oldHat && joyEvents) {
+        if (hat != oldHat && joyEvents)
+        {
                 joyEvents->OnHatSwitch(hat);
                 oldHat = hat;
         }
@@ -39,11 +44,14 @@ void JoystickReportParser::Parse(USBHID *hid, bool is_rpt_id, uint8_t len, uint8
         uint16_t changes = (buttons ^ oldButtons);
 
         // Calling Button Event Handler for every button changed
-        if (changes) {
-                for (uint8_t i = 0; i < 0x0C; i++) {
+        if (changes)
+        {
+                for (uint8_t i = 0; i < 0x0C; i++)
+                {
                         uint16_t mask = (0x0001 << i);
 
-                        if (((mask & changes) > 0) && joyEvents) {
+                        if (((mask & changes) > 0) && joyEvents)
+                        {
                                 if ((buttons & mask) > 0)
                                         joyEvents->OnButtonDn(i + 1);
                                 else
@@ -54,32 +62,81 @@ void JoystickReportParser::Parse(USBHID *hid, bool is_rpt_id, uint8_t len, uint8
         }
 }
 
-void JoystickEvents::OnGamePadChanged(const GamePadEventData *evt) {
+void JoystickEvents::OnGamePadChanged(const GamePadEventData *evt)
+{
         Serial.print("X1: ");
-        PrintHex<uint8_t > (evt->X, 0x80);
+        PrintHex<uint8_t>(evt->X, 0x80);
         Serial.print("\tY1: ");
-        PrintHex<uint8_t > (evt->Y, 0x80);
+        PrintHex<uint8_t>(evt->Y, 0x80);
         Serial.print("\tX2: ");
-        PrintHex<uint8_t > (evt->Z1, 0x80);
+        PrintHex<uint8_t>(evt->Z1, 0x80);
         Serial.print("\tY2: ");
-        PrintHex<uint8_t > (evt->Z2, 0x80);
+        PrintHex<uint8_t>(evt->Z2, 0x80);
         Serial.print("\tRz: ");
-        PrintHex<uint8_t > (evt->Rz, 0x80);
+        PrintHex<uint8_t>(evt->Rz, 0x80);
         Serial.println("");
 }
 
-void JoystickEvents::OnHatSwitch(uint8_t hat) {
+void JoystickEvents::OnHatSwitch(uint8_t hat)
+{
         Serial.print("Hat Switch: ");
-        PrintHex<uint8_t > (hat, 0x80);
+        // PrintHex<uint8_t > (hat, 0x80);
+        Serial.println(hat);
         Serial.println("");
+
+        // switch (hat)
+        // {
+        // case(0):
+        //         valueRead = 0;
+        //         break;
+        
+        // default:
+        //         break;
+        // }
+
+        if (hat == 0)
+        {
+                Serial.println("Forward!");
+                valueRead = 0;
+                // delay(1000);
+                // valueRead = 8;
+        }
+        else if (hat == 4)
+        {
+                Serial.println("Reverse!");
+                valueRead = 4;
+                // delay(1000);
+                // valueRead = 8;
+        }
+        else if (hat == 6)
+        {
+                Serial.println("Left!");
+                valueRead = 6;
+                // delay(10);
+                // valueRead = 8;
+        }
+        else if (hat == 2)
+        {
+                Serial.println("Right!");
+                valueRead = 2;
+                // delay(10);
+                // valueRead = 8;
+        }
+        else
+        {
+                valueRead = 5;
+        }
+
 }
 
-void JoystickEvents::OnButtonUp(uint8_t but_id) {
+void JoystickEvents::OnButtonUp(uint8_t but_id)
+{
         Serial.print("Up: ");
         Serial.println(but_id, DEC);
 }
 
-void JoystickEvents::OnButtonDn(uint8_t but_id) {
+void JoystickEvents::OnButtonDn(uint8_t but_id)
+{
         Serial.print("Dn: ");
         Serial.println(but_id, DEC);
 }

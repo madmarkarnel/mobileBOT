@@ -13,6 +13,8 @@ public:
         virtual void OnHatSwitch(uint8_t hat);
         virtual void OnButtonUp(uint8_t but_id);
         virtual void OnButtonDn(uint8_t but_id);
+        int valueRead = 5;
+        int CTRLFLAG = 0;
 };
 
 #define RPT_GEMEPAD_LEN		5
