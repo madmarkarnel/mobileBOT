@@ -25,7 +25,8 @@
 #define CS_THRESHOLD 100
 
 #define BOTFLAG 1
-#define MTRSPEED 100
+#define MTRSPEED 1023
+#define SPDLEFTRIGHT  60    //stable at 60
 
 #include <PS2X_lib.h>  //for v1.6
 PS2X ps2x; // create PS2 Controller Class
@@ -109,7 +110,7 @@ void loop()
 
 void left_LEFT()
 {
-  for(int i=0; i<=60; i++){
+  for(int i=0; i<=SPDLEFTRIGHT; i++){
     motorGo(0, 1, i);
     motorGo(1, 1, i);
     Serial.println("Going left!");
@@ -118,12 +119,32 @@ void left_LEFT()
 
 void right_RIGHT()
 {
-  for(int i=0; i <= 60; i++){
+  for(int i=0; i <= SPDLEFTRIGHT; i++){
     motorGo(1, 2, i);
     motorGo(0, 2, i);  
     Serial.println("Going right!");
     delay(2);
   }
+}
+
+void launcher_up()
+{
+  // for(int i=0; i<=MTRSPEED; i++){
+    motorGo(0, 1, MTRSPEED);
+    motorGo(1, 2, MTRSPEED);  
+    Serial.println("Forward!");  
+    delay(2);
+  // }
+}
+
+void launcher_down()
+{
+  // for(int i=0; i <= MTRSPEED; i++){
+    motorGo(0, 2, MTRSPEED);
+    motorGo(1, 1, MTRSPEED);  
+    Serial.println("Reverse!"); 
+    delay(2);
+  // } 
 }
 
 void forward_up()
@@ -232,7 +253,16 @@ void robotControls()
       Serial.println(ps2x.Analog(PSAB_PAD_DOWN), DEC);
       reverse_down();
       // break;
-    }  
+    }
+    else if(ps2x.ButtonPressed(PSB_RED)){
+      //circle
+      launcher_up();
+    }
+    else if(ps2x.ButtonReleased(PSB_PINK)){
+      //square
+      launcher_down();
+    }
+    
     else{
       Serial.println("Triagle pressed!");
       break_bot();
