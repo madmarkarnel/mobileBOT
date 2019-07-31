@@ -125,7 +125,36 @@ void JoystickEvents::OnButtonUp(uint8_t but_id)
         {
                 Serial.println(" DNNNN Shooting motor OFF!");
                 mtrshoot = 0;
-        }        
+        }
+        else if (but_id == 1)
+        {
+                Serial.println("X button is released!");
+                mtrshoot = 0;
+
+        }
+        else if (but_id == 4)
+        {
+                Serial.println("Y button is released!");
+                mtrshoot = 0;
+        }
+        else if (but_id == 7)
+        {
+                Serial.println("Collecting ball!");
+                mtrshoot = 0;
+        }
+        else if (but_id == 5)
+        {
+                Serial.println("Feeding ball to shooter!");
+                mtrshoot = 0;
+        }
+        else if (but_id == 8)
+        {
+                mtrshoot = 0;
+        }
+        else if (but_id == 6)
+        {
+                mtrshoot = 0;
+        }
 }
 
 void JoystickEvents::OnButtonDn(uint8_t but_id)
@@ -143,6 +172,36 @@ void JoystickEvents::OnButtonDn(uint8_t but_id)
                 Serial.println("Shooting motor OFF!");
                 mtrshoot = 3;
         }
+        else if (but_id == 1)
+        {
+                Serial.println("X button is pressed!");
+                mtrshoot = 1;
+        }
+        else if (but_id == 4)
+        {
+                Serial.println("Y button is pressed!");
+                mtrshoot = 4;
+        }
+        else if (but_id == 7)
+        {
+                Serial.println("Collecting ball!");
+                mtrshoot = 7;
+        }
+        else if (but_id == 5)
+        {
+                Serial.println("Feeding ball to shooter!");
+                mtrshoot = 5;
+        }
+        else if (but_id == 8)
+        {
+                Serial.println("collector inside lever!");
+                mtrshoot = 8;
+        }
+        else if (but_id == 6)
+        {
+                Serial.println("Collector back to position!");
+                mtrshoot = 6;
+        }        
         else
         {
                 mtrshoot = 0;

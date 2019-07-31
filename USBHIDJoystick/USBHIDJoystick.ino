@@ -1,18 +1,20 @@
 #include <usbhid.h>
 #include <hiduniversal.h>
 #include <usbhub.h>
+#include <SPI.h>
+#include "hidjoystickrptparser.h"
+//servo
+#include <Wire.h>
+#include <Adafruit_PWMServoDriver.h>
+Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 
 // Satisfy IDE, which only needs to see the include statment in the ino.
 #ifdef dobogusinclude
 #include <spi4teensy3.h>
 #endif
 
-#include <SPI.h>
-
-#include "hidjoystickrptparser.h"
-
 USB Usb;
-USBHub Hub(&Usb);
+// USBHub Hub(&Usb);
 HIDUniversal Hid(&Usb);
 JoystickEvents JoyEvents;
 JoystickReportParser Joy(&JoyEvents);
@@ -23,10 +25,19 @@ JoystickReportParser Joy(&JoyEvents);
 #define CCW 2
 #define BRAKEGND 3
 #define CS_THRESHOLD 100
+#define RSTPIN  2
 
 #define BOTFLAG 1
 #define MTRSPEED 1023
 #define SPDLEFTRIGHT 500 //stable at 60
+
+#define SERVOMIN  120 // this is the 'minimum' pulse length count (out of 4096)
+#define SERVOMAX  570 // this is the 'maximum' pulse length count (out of 4096)
+#define SERVOLEVER1 0
+#define SERVOLEVER2 1
+#define SERVOCLTR1  2
+#define SERVOCLTR2  3
+#define DELAYSERVO  1000
 
 /*  VNH2SP30 pin definitions
  xxx[0] controls '1' outputs 
@@ -44,11 +55,29 @@ int enpin[2] = {0, 1};  // EN: Status of switches output (Analog pin)
 
 int statpin = 13;
 
+bool resetFlag = true;
+
 void setup()
 {
-  Serial.begin(115200);
+  // delay(10000);
+    delay(10000);
 
   pinMode(statpin, OUTPUT);
+  pinMode(RSTPIN, OUTPUT);
+
+  Serial.begin(115200);
+
+  pwm.begin();
+  pwm.setPWMFreq(60);  // Analog servos run at ~60 Hz updates
+  delay(10);
+
+  // while(resetFlag == true)
+  // {
+  //   digitalWrite(RSTPIN, LOW);
+  //   delay(500);
+  //   digitalWrite(RSTPIN, HIGH);
+  //   resetFlag = false;
+  // }
 
   // Initialize digital pins as outputs
   for (int i = 0; i < 2; i++)
@@ -78,6 +107,8 @@ void setup()
 
   if (!Hid.SetReportParser(0, &Joy))
     ErrorMessage<uint8_t>(PSTR("SetReportParser"), 1);
+
+    digitalWrite(statpin, HIGH);
 }
 
 void loop()
@@ -117,10 +148,48 @@ void loop()
       shooterMotorOff(18);
       shooterMotorOff(19);
     }
+    else if (JoyEvents.mtrshoot == 1)
+    {
+      Serial.println("X button is pressed!");
+    }
+    else if (JoyEvents.mtrshoot == 4)
+    {
+      Serial.println("Y button is pressed!");
+    }
+    else if (JoyEvents.mtrshoot == 7)
+    {
+      Serial.println("collecting ball!");
+      pwm.setPWM(SERVOLEVER1, 0, angleToPulse(90));
+    }
+    else if (JoyEvents.mtrshoot == 5)
+    {
+      Serial.println("feeding ball to shoot!");
+      pwm.setPWM(SERVOLEVER1, 0, angleToPulse(180));
+      delay(DELAYSERVO);
+      pwm.setPWM(SERVOLEVER1, 0, angleToPulse(0));
+    }
+    else if (JoyEvents.mtrshoot == 8)
+    {
+      Serial.println("collecting ball to lever!");
+      pwm.setPWM(SERVOCLTR1, 0, angleToPulse(180));
+    }
+    else if (JoyEvents.mtrshoot == 6)
+    {
+      Serial.println("back to original position!");
+      pwm.setPWM(SERVOCLTR1, 0, angleToPulse(0));
+    }
     else
     {
       break_bot();
     }
+}
+
+int angleToPulse(int angle)
+{
+  int pulse = map(angle, 0, 180, SERVOMIN, SERVOMAX);
+  Serial.print("Angle: ");  Serial.print(angle);
+  Serial.print(" Pulse: "); Serial.println(pulse);
+  return pulse;
 }
 
 void left_LEFT()
