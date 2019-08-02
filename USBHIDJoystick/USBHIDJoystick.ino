@@ -31,8 +31,8 @@ JoystickReportParser Joy(&JoyEvents);
 #define MTRSPEED 1023
 #define SPDLEFTRIGHT 500 //stable at 60
 
-#define SERVOMIN  120 // this is the 'minimum' pulse length count (out of 4096)
-#define SERVOMAX  570 // this is the 'maximum' pulse length count (out of 4096)
+#define SERVOMIN  110 // this is the 'minimum' pulse length count (out of 4096)
+#define SERVOMAX  580 // this is the 'maximum' pulse length count (out of 4096)
 #define SERVOLEVER1 0
 #define SERVOLEVER2 1
 #define SERVOCLTR1  2
@@ -59,9 +59,6 @@ bool resetFlag = true;
 
 void setup()
 {
-  // delay(10000);
-    delay(10000);
-
   pinMode(statpin, OUTPUT);
   pinMode(RSTPIN, OUTPUT);
 
@@ -113,6 +110,7 @@ void setup()
 
 void loop()
 {
+  // pwm.setPWM(SERVOCLTR1, 0, 600);
   // getAtcommand();
   
   Usb.Task();
@@ -160,13 +158,19 @@ void loop()
     {
       Serial.println("collecting ball!");
       pwm.setPWM(SERVOLEVER1, 0, angleToPulse(90));
+      pwm.setPWM(SERVOLEVER2, 0, angleToPulse(270-90));   //servo 2 reverse direction
+
+      // pwm.setPWM(SERVOLEVER1, 0, 110);    //minimum 110
     }
     else if (JoyEvents.mtrshoot == 5)
     {
       Serial.println("feeding ball to shoot!");
+      // pwm.setPWM(SERVOLEVER1, 0, 580);    //maximum 580 @270 degrees
       pwm.setPWM(SERVOLEVER1, 0, angleToPulse(180));
+      pwm.setPWM(SERVOLEVER2, 0, angleToPulse(270-180));    //servo 2 reverse direction
       delay(DELAYSERVO);
       pwm.setPWM(SERVOLEVER1, 0, angleToPulse(0));
+      pwm.setPWM(SERVOLEVER2, 0, angleToPulse(270-0));      //servo 2 reverse direction
     }
     else if (JoyEvents.mtrshoot == 8)
     {
@@ -182,11 +186,12 @@ void loop()
     {
       break_bot();
     }
+    
 }
 
 int angleToPulse(int angle)
 {
-  int pulse = map(angle, 0, 180, SERVOMIN, SERVOMAX);
+  int pulse = map(angle, 0, 270, SERVOMIN, SERVOMAX);
   Serial.print("Angle: ");  Serial.print(angle);
   Serial.print(" Pulse: "); Serial.println(pulse);
   return pulse;
