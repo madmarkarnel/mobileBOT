@@ -33,10 +33,10 @@ JoystickReportParser Joy(&JoyEvents);
 
 #define SERVOMIN  110 // this is the 'minimum' pulse length count (out of 4096)
 #define SERVOMAX  580 // this is the 'maximum' pulse length count (out of 4096)
-#define SERVOLEVER1 0
-#define SERVOLEVER2 1
-#define SERVOCLTR1  2
-#define SERVOCLTR2  3
+#define SERVOLEVER1 5
+#define SERVOLEVER2 6
+#define SERVOCLTR1  7
+#define SERVOCLTR2  8
 #define DELAYSERVO  1000
 
 /*  VNH2SP30 pin definitions
@@ -157,8 +157,8 @@ void loop()
     else if (JoyEvents.mtrshoot == 7)
     {
       Serial.println("collecting ball!");
-      pwm.setPWM(SERVOLEVER1, 0, angleToPulse(90));
-      pwm.setPWM(SERVOLEVER2, 0, angleToPulse(270-90));   //servo 2 reverse direction
+      pwm.setPWM(SERVOLEVER1, 0, angleToPulse(50));
+      pwm.setPWM(SERVOLEVER2, 0, angleToPulse(270-50));   //servo 2 reverse direction
 
       // pwm.setPWM(SERVOLEVER1, 0, 110);    //minimum 110
     }
@@ -166,8 +166,8 @@ void loop()
     {
       Serial.println("feeding ball to shoot!");
       // pwm.setPWM(SERVOLEVER1, 0, 580);    //maximum 580 @270 degrees
-      pwm.setPWM(SERVOLEVER1, 0, angleToPulse(180));
-      pwm.setPWM(SERVOLEVER2, 0, angleToPulse(270-180));    //servo 2 reverse direction
+      pwm.setPWM(SERVOLEVER1, 0, angleToPulse(120));
+      pwm.setPWM(SERVOLEVER2, 0, angleToPulse(270-120));    //servo 2 reverse direction
       delay(DELAYSERVO);
       pwm.setPWM(SERVOLEVER1, 0, angleToPulse(0));
       pwm.setPWM(SERVOLEVER2, 0, angleToPulse(270-0));      //servo 2 reverse direction
@@ -175,12 +175,14 @@ void loop()
     else if (JoyEvents.mtrshoot == 8)
     {
       Serial.println("collecting ball to lever!");
-      pwm.setPWM(SERVOCLTR1, 0, angleToPulse(180));
+      pwm.setPWM(SERVOCLTR1, 0, angleToPulse(0));
+      pwm.setPWM(SERVOCLTR2, 0, angleToPulse(270-0));
     }
     else if (JoyEvents.mtrshoot == 6)
     {
       Serial.println("back to original position!");
-      pwm.setPWM(SERVOCLTR1, 0, angleToPulse(0));
+      pwm.setPWM(SERVOCLTR1, 0, angleToPulse(90));
+      pwm.setPWM(SERVOCLTR2, 0, angleToPulse(270-90));
     }
     else
     {
