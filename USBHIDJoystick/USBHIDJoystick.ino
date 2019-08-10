@@ -29,14 +29,14 @@ JoystickReportParser Joy(&JoyEvents);
 
 #define BOTFLAG 1
 #define MTRSPEED 1023
-#define SPDLEFTRIGHT 500 //stable at 60
+#define SPDLEFTRIGHT 500
 
-#define SERVOMIN  110 // this is the 'minimum' pulse length count (out of 4096)
+#define SERVOMIN  110   // this is the 'minimum' pulse length count (out of 4096)
 #define SERVOMAX  580 // this is the 'maximum' pulse length count (out of 4096)
 #define SERVOLEVER1 5
 #define SERVOLEVER2 6
 #define SERVOCLTR1  7
-#define SERVOCLTR2  8
+#define SERVOCLTR2  9
 #define DELAYSERVO  1000
 
 /*  VNH2SP30 pin definitions
@@ -46,9 +46,9 @@ int inApin[2] = {7, 4}; // INA: Clockwise input
 int inBpin[2] = {8, 3}; // INB: Counter-clockwise input  9=3,pinalitan lang,default:9
 int pwmpin[2] = {5, 6}; // PWM input
 
-int mtrShotA[2] = {14, 15};   // [7,4] - motor shield (shooter motor A clockwise)
-int mtrShotB[2] = {16, 17};   // [8,9] - motor shield (shooter motor B counter-clockwise)
-int pwmShot[2] = {18,19};     // [5,6] - motor shield (pwm input shooter)
+int mtrShotA[2] = {26, 27};   // [7,4] - motor shield (shooter motor A clockwise)
+int mtrShotB[2] = {24, 22};   // [8,9] - motor shield (shooter motor B counter-clockwise)
+int pwmShot[2] = {25,23};     // [5,6] - motor shield (pwm input shooter)
 
 int cspin[2] = {2, 3};  // CS: Current sense ANALOG input
 int enpin[2] = {0, 1};  // EN: Status of switches output (Analog pin)
@@ -156,6 +156,7 @@ void loop()
     }
     else if (JoyEvents.mtrshoot == 7)
     {
+      Serial.println("LT is pressed!");
       Serial.println("collecting ball!");
       pwm.setPWM(SERVOLEVER1, 0, angleToPulse(50));
       pwm.setPWM(SERVOLEVER2, 0, angleToPulse(270-50));   //servo 2 reverse direction
@@ -164,6 +165,7 @@ void loop()
     }
     else if (JoyEvents.mtrshoot == 5)
     {
+      Serial.println("LB is pressed!");
       Serial.println("feeding ball to shoot!");
       // pwm.setPWM(SERVOLEVER1, 0, 580);    //maximum 580 @270 degrees
       pwm.setPWM(SERVOLEVER1, 0, angleToPulse(120));
@@ -174,15 +176,17 @@ void loop()
     }
     else if (JoyEvents.mtrshoot == 8)
     {
+      Serial.println("RT is pressed!");
       Serial.println("collecting ball to lever!");
-      pwm.setPWM(SERVOCLTR1, 0, angleToPulse(0));
-      pwm.setPWM(SERVOCLTR2, 0, angleToPulse(270-0));
+      pwm.setPWM(SERVOCLTR1, 0, angleToPulse(180));
+      pwm.setPWM(SERVOCLTR2, 0, angleToPulse(270-180));
     }
     else if (JoyEvents.mtrshoot == 6)
     {
+      Serial.println("RB is pressed!");
       Serial.println("back to original position!");
-      pwm.setPWM(SERVOCLTR1, 0, angleToPulse(90));
-      pwm.setPWM(SERVOCLTR2, 0, angleToPulse(270-90));
+      pwm.setPWM(SERVOCLTR1, 0, angleToPulse(0));
+      pwm.setPWM(SERVOCLTR2, 0, angleToPulse(270-0));
     }
     else
     {
