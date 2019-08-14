@@ -14,7 +14,7 @@ Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver();
 #endif
 
 USB Usb;
-// USBHub Hub(&Usb);
+USBHub Hub(&Usb);
 HIDUniversal Hid(&Usb);
 JoystickEvents JoyEvents;
 JoystickReportParser Joy(&JoyEvents);
@@ -32,7 +32,7 @@ JoystickReportParser Joy(&JoyEvents);
 #define SPDLEFTRIGHT 500
 
 #define SERVOMIN  110   // this is the 'minimum' pulse length count (out of 4096)
-#define SERVOMAX  580 // this is the 'maximum' pulse length count (out of 4096)
+#define SERVOMAX  580   // this is the 'maximum' pulse length count (out of 4096)
 #define SERVOLEVER1 5
 #define SERVOLEVER2 6
 #define SERVOCLTR1  7
@@ -54,27 +54,18 @@ int cspin[2] = {2, 3};  // CS: Current sense ANALOG input
 int enpin[2] = {0, 1};  // EN: Status of switches output (Analog pin)
 
 int statpin = 13;
-
 bool resetFlag = true;
 
 void setup()
 {
   pinMode(statpin, OUTPUT);
   pinMode(RSTPIN, OUTPUT);
-
   Serial.begin(115200);
 
+  // servo initialization
   pwm.begin();
   pwm.setPWMFreq(60);  // Analog servos run at ~60 Hz updates
   delay(10);
-
-  // while(resetFlag == true)
-  // {
-  //   digitalWrite(RSTPIN, LOW);
-  //   delay(500);
-  //   digitalWrite(RSTPIN, HIGH);
-  //   resetFlag = false;
-  // }
 
   // Initialize digital pins as outputs
   for (int i = 0; i < 2; i++)
@@ -109,64 +100,59 @@ void setup()
 }
 
 void loop()
-{
-  // pwm.setPWM(SERVOCLTR1, 0, 600);
-  // getAtcommand();
-  
+{  
   Usb.Task();
 
     if (JoyEvents.valueRead == 0)
     {
-      Serial.println("Forward!");
+      Serial.println("Up button is pressed");
       forward_up();
     }
     else if (JoyEvents.valueRead == 4)
     {
-      Serial.println("Reverse!");
+      Serial.println("Down button is pressed");
       reverse_down();
     }
     else if (JoyEvents.valueRead == 6)
     {
-      Serial.println("Left!");
-      left_LEFT();
+      Serial.println("Left button is pressed");
+      right_RIGHT();
     }
     else if (JoyEvents.valueRead == 2)
     {
-      Serial.println("Right!");
-      right_RIGHT();
+      Serial.println("Right button is pressed");
+      left_LEFT();
     }
-    else if (JoyEvents.mtrshoot == 2)
+    else if (JoyEvents.buttonPress == 2)
     {
-      Serial.println("Start shooting!");
+      Serial.println("A button is pressed");
       launcher_up();
     }
-    else if (JoyEvents.mtrshoot == 3)
+    else if (JoyEvents.buttonPress == 3)
     {
-      Serial.println("Stop motor shoot!");
+      Serial.println("B button is pressed");
       shooterMotorOff(18);
       shooterMotorOff(19);
     }
-    else if (JoyEvents.mtrshoot == 1)
+    else if (JoyEvents.buttonPress == 1)
     {
       Serial.println("X button is pressed!");
     }
-    else if (JoyEvents.mtrshoot == 4)
+    else if (JoyEvents.buttonPress == 4)
     {
       Serial.println("Y button is pressed!");
     }
-    else if (JoyEvents.mtrshoot == 7)
+    else if (JoyEvents.buttonPress == 7)
     {
       Serial.println("LT is pressed!");
       Serial.println("collecting ball!");
       pwm.setPWM(SERVOLEVER1, 0, angleToPulse(50));
-      pwm.setPWM(SERVOLEVER2, 0, angleToPulse(270-50));   //servo 2 reverse direction
-
-      // pwm.setPWM(SERVOLEVER1, 0, 110);    //minimum 110
+      pwm.setPWM(SERVOLEVER2, 0, angleToPulse(270-50));   //servo 2 reverse direction (max degrees - N)
     }
-    else if (JoyEvents.mtrshoot == 5)
+    else if (JoyEvents.buttonPress == 5)
     {
       Serial.println("LB is pressed!");
-      Serial.println("feeding ball to shoot!");
+      // Serial.println("feeding ball to shoot!");
       // pwm.setPWM(SERVOLEVER1, 0, 580);    //maximum 580 @270 degrees
       pwm.setPWM(SERVOLEVER1, 0, angleToPulse(120));
       pwm.setPWM(SERVOLEVER2, 0, angleToPulse(270-120));    //servo 2 reverse direction
@@ -174,17 +160,17 @@ void loop()
       pwm.setPWM(SERVOLEVER1, 0, angleToPulse(0));
       pwm.setPWM(SERVOLEVER2, 0, angleToPulse(270-0));      //servo 2 reverse direction
     }
-    else if (JoyEvents.mtrshoot == 8)
+    else if (JoyEvents.buttonPress == 8)
     {
       Serial.println("RT is pressed!");
-      Serial.println("collecting ball to lever!");
+      // Serial.println("collecting ball to lever!");
       pwm.setPWM(SERVOCLTR1, 0, angleToPulse(180));
       pwm.setPWM(SERVOCLTR2, 0, angleToPulse(270-180));
     }
-    else if (JoyEvents.mtrshoot == 6)
+    else if (JoyEvents.buttonPress == 6)
     {
       Serial.println("RB is pressed!");
-      Serial.println("back to original position!");
+      // Serial.println("back to original position!");
       pwm.setPWM(SERVOCLTR1, 0, angleToPulse(0));
       pwm.setPWM(SERVOCLTR2, 0, angleToPulse(270-0));
     }
@@ -192,7 +178,6 @@ void loop()
     {
       break_bot();
     }
-    
 }
 
 int angleToPulse(int angle)
@@ -207,42 +192,42 @@ void left_LEFT()
 {
     motorGo(0, 1, MTRSPEED);
     motorGo(1, 1, MTRSPEED);
-    Serial.println("Going left!");
+    // Serial.println("Going left!");
 }
 
 void right_RIGHT()
 {
     motorGo(0, 2, MTRSPEED);
     motorGo(1, 2, MTRSPEED);
-    Serial.println("Going right!");
+    // Serial.println("Going right!");
 }
 
 void launcher_up()
 {
   shootMotorGo(0, 1, MTRSPEED);
   shootMotorGo(1, 2, MTRSPEED);
-  Serial.println("Shooter forward!");
+  // Serial.println("Shooter forward!");
 }
 
 void launcher_down()
 {
   shootMotorGo(0, 2, MTRSPEED);
   shootMotorGo(1, 1, MTRSPEED);
-  Serial.println("Shooter reverse!");
+  // Serial.println("Shooter reverse!");
 }
 
 void forward_up()
 {
     motorGo(0, 1, MTRSPEED);    //left motor
     motorGo(1, 2, MTRSPEED);    //right motor
-    Serial.println("Forward!");
+    // Serial.println("Forward!");
 }
 
 void reverse_down()
 {
     motorGo(0, 2, MTRSPEED);    //left motor
     motorGo(1, 1, MTRSPEED);    //right motor
-    Serial.println("Reverse!");
+    // Serial.println("Reverse!");
 }
 
 void break_bot()
@@ -333,61 +318,4 @@ void shootMotorGo(uint8_t motor, uint8_t direct, uint8_t pwm)
       analogWrite(pwmShot[motor], pwm);
     }
   }
-}
-
-
-#define ATCMD     "AT"
-#define ATECMDTRUE  "ATE"
-#define ATECMDFALSE "ATE0"
-#define OKSTR     "OK"
-#define ERRORSTR  "ERROR"
-
-bool ate = false;
-
-void getAtcommand(){
-
-  String serial_line, command;
-  int i_equals = 0;
-    
-  do{
-     serial_line = Serial.readStringUntil('\r\n');
-    }while(serial_line == "");
-    serial_line.toUpperCase();
-    serial_line.replace("\r","");
-
-    // echo command if ate is set, default true
-    if (ate) Serial.println(serial_line);
-
-    // get characters before '='
-    i_equals = serial_line.indexOf('=');
-    if (i_equals == -1) command = serial_line;
-    else command = serial_line.substring(0,i_equals);
-
-    // Serial.println(command);
-    
-    if (command == ATCMD)
-      Serial.println(OKSTR);
-    else if (command == ATECMDTRUE){
-      ate = true;
-      Serial.println(OKSTR);
-    }
-    else if (command == ATECMDFALSE){
-      ate = false;
-      Serial.println(OKSTR);
-    }
-    else if (command == "W"){
-      forward_up();
-    }
-    else if (command == "S"){
-      reverse_down();
-    }
-    else if (command == "A"){
-      left_LEFT();
-    }
-    else if (command == "D"){
-      right_RIGHT();
-    }    
-    else{
-      Serial.println(ERRORSTR);
-    }
 }

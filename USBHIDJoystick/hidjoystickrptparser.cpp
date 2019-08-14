@@ -78,30 +78,31 @@ void JoystickEvents::OnGamePadChanged(const GamePadEventData *evt)
 }
 
 void JoystickEvents::OnHatSwitch(uint8_t hat)
-{
+{       /*
         Serial.print("Hat Switch: ");
         // PrintHex<uint8_t > (hat, 0x80);
         Serial.println(hat);
         Serial.println("");
+        */
 
         if (hat == 0)
         {
-                Serial.println("Forward!");
+                // Serial.println("Forward!");
                 valueRead = 0;
         }
         else if (hat == 4)
         {
-                Serial.println("Reverse!");
+                // Serial.println("Reverse!");
                 valueRead = 4;
         }        
         else if (hat == 6)
         {
-                Serial.println("Left!");
+                // Serial.println("Left!");
                 valueRead = 6;
         }
         else if (hat == 2)
         {
-                Serial.println("Right!");
+                // Serial.println("Right!");
                 valueRead = 2;
         }
         else
@@ -112,98 +113,100 @@ void JoystickEvents::OnHatSwitch(uint8_t hat)
 }
 
 void JoystickEvents::OnButtonUp(uint8_t but_id)
-{
+{       /*
         Serial.print("Up: ");
         Serial.println(but_id, DEC);
+        //button released!
+        */
 
         if(but_id == 2)
         {
-                Serial.println(" DNNNN Shooting motor ON!");
-                mtrshoot = 0;
+                // Serial.println(" DNNNN Shooting motor ON!");
+                buttonPress = 0;
         }
         else if (but_id == 3)
         {
-                Serial.println(" DNNNN Shooting motor OFF!");
-                mtrshoot = 0;
+                // Serial.println(" DNNNN Shooting motor OFF!");
+                buttonPress = 0;
         }
         else if (but_id == 1)
         {
-                Serial.println("X button is released!");
-                mtrshoot = 0;
-
+                // Serial.println("X button is released!");
+                buttonPress = 0;
         }
         else if (but_id == 4)
         {
-                Serial.println("Y button is released!");
-                mtrshoot = 0;
+                // Serial.println("Y button is released!");
+                buttonPress = 0;
         }
         else if (but_id == 7)
         {
-                Serial.println("Collecting ball!");
-                mtrshoot = 0;
+                // Serial.println("Collecting ball!");
+                buttonPress = 0;
         }
         else if (but_id == 5)
         {
-                Serial.println("Feeding ball to shooter!");
-                mtrshoot = 0;
+                // Serial.println("Feeding ball to shooter!");
+                buttonPress = 0;
         }
         else if (but_id == 8)
         {
-                mtrshoot = 0;
+                buttonPress = 0;
         }
         else if (but_id == 6)
         {
-                mtrshoot = 0;
+                buttonPress = 0;
         }
 }
 
 void JoystickEvents::OnButtonDn(uint8_t but_id)
-{
+{       /*
         Serial.print("Dn: ");
         Serial.println(but_id, DEC);
-
+        //button is pressed!
+        */
         if(but_id == 2)
         {
-                Serial.println("Shooting motor ON!");
-                mtrshoot = 2;
+                // Serial.println("Shooting motor ON!");
+                buttonPress = 2;
         }
         else if (but_id == 3)
         {
-                Serial.println("Shooting motor OFF!");
-                mtrshoot = 3;
+                // Serial.println("Shooting motor OFF!");
+                buttonPress = 3;
         }
         else if (but_id == 1)
         {
-                Serial.println("X button is pressed!");
-                mtrshoot = 1;
+                // Serial.println("X button is pressed!");
+                buttonPress = 1;
         }
         else if (but_id == 4)
         {
-                Serial.println("Y button is pressed!");
-                mtrshoot = 4;
+                // Serial.println("Y button is pressed!");
+                buttonPress = 4;
         }
         else if (but_id == 7)
         {
-                Serial.println("Collecting ball!");
-                mtrshoot = 7;
+                // Serial.println("Collecting ball!");
+                buttonPress = 7;
         }
         else if (but_id == 5)
         {
-                Serial.println("Feeding ball to shooter!");
-                mtrshoot = 5;
+                // Serial.println("Feeding ball to shooter!");
+                buttonPress = 5;
         }
         else if (but_id == 8)
         {
-                Serial.println("collector inside lever!");
-                mtrshoot = 8;
+                // Serial.println("collector inside lever!");
+                buttonPress = 8;
         }
         else if (but_id == 6)
         {
-                Serial.println("Collector back to position!");
-                mtrshoot = 6;
+                // Serial.println("Collector back to position!");
+                buttonPress = 6;
         }        
         else
         {
-                mtrshoot = 0;
+                buttonPress = 0;
         }
 }
