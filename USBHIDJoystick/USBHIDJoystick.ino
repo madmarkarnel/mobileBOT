@@ -154,8 +154,8 @@ void loop()
       Serial.println("LB is pressed!");
       // Serial.println("feeding ball to shoot!");
       // pwm.setPWM(SERVOLEVER1, 0, 580);    //maximum 580 @270 degrees
-      pwm.setPWM(SERVOLEVER1, 0, angleToPulse(120));
-      pwm.setPWM(SERVOLEVER2, 0, angleToPulse(270-120));    //servo 2 reverse direction
+      pwm.setPWM(SERVOLEVER1, 0, angleToPulse(125));
+      pwm.setPWM(SERVOLEVER2, 0, angleToPulse(270-125));    //servo 2 reverse direction
       delay(DELAYSERVO);
       pwm.setPWM(SERVOLEVER1, 0, angleToPulse(0));
       pwm.setPWM(SERVOLEVER2, 0, angleToPulse(270-0));      //servo 2 reverse direction
