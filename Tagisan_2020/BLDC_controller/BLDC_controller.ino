@@ -9,7 +9,7 @@
 #define POWER 150 //0-255 max pwm
 #define INCREMENT 5
 #define DECREMENT 15
-#define START_OFFSET 20
+#define START_OFFSET 50
 #define PWM_DELAY 20
 
 #define POT A0
@@ -64,32 +64,27 @@ void read_serial()
   if (serial_input == "DOWN")
   {
     Serial.println(serial_input);
-    rotate_CW(M1_PWM, M1_DIRECTION, M1_BRAKE);
-    rotate_CCW(M2_PWM, M2_DIRECTION, M2_BRAKE);
+    reverse();
   }
   else if (serial_input == "UP")
   {
     Serial.println(serial_input);
-    rotate_CCW(M1_PWM, M1_DIRECTION, M1_BRAKE);
-    rotate_CW(M2_PWM, M2_DIRECTION, M2_BRAKE);
+    forward();
   }
   else if (serial_input == "LEFT")
   {
     Serial.println(serial_input);
-    rotate_CW(M1_PWM, M1_DIRECTION, M1_BRAKE);
-    rotate_CW(M2_PWM, M2_DIRECTION, M2_BRAKE);
+    turn_left();
   }
   else if (serial_input == "RIGHT")
   {
     Serial.println(serial_input);
-    rotate_CCW(M1_PWM, M1_DIRECTION, M1_BRAKE);
-    rotate_CCW(M2_PWM, M2_DIRECTION, M2_BRAKE);
+    turn_right();
   }
   else if (serial_input == "LEFTZ-2")
   {
     Serial.println(serial_input);
-    break_motor(M1_PWM, M1_DIRECTION, M1_BRAKE);
-    break_motor(M2_PWM, M2_DIRECTION, M2_BRAKE);
+    stop_motors();
   }
   else if (serial_input == "LEFTZ-1")
   {
@@ -126,6 +121,8 @@ void read_serial()
 void forward()
 {
   Serial.println("Moving Forward!");
+  digitalWrite(M1_BRAKE, HIGH);
+  digitalWrite(M2_BRAKE, HIGH);
   digitalWrite(M1_DIRECTION, LOW);
   digitalWrite(M2_DIRECTION, HIGH);
   for (int PWM_VAL = START_OFFSET; PWM_VAL <= POWER; PWM_VAL++)
@@ -142,7 +139,47 @@ void forward()
 void reverse()
 {
   Serial.println("Moving Reverse!");
+  digitalWrite(M1_BRAKE, HIGH);
+  digitalWrite(M2_BRAKE, HIGH);
   digitalWrite(M1_DIRECTION, HIGH);
+  digitalWrite(M2_DIRECTION, LOW);
+  for (int PWM_VAL = START_OFFSET; PWM_VAL <= POWER; PWM_VAL++)
+  {
+    analogWrite(M1_PWM, PWM_VAL);
+    analogWrite(M2_PWM, PWM_VAL);
+    delay(PWM_DELAY);
+  }
+}
+
+/**
+ * Move Left
+*/
+void turn_left()
+{
+  Serial.println("Moving Reverse!");
+  digitalWrite(M1_BRAKE, HIGH);
+  digitalWrite(M2_BRAKE, HIGH);
+
+  digitalWrite(M1_DIRECTION, HIGH);
+  digitalWrite(M2_DIRECTION, HIGH);
+  for (int PWM_VAL = START_OFFSET; PWM_VAL <= POWER; PWM_VAL++)
+  {
+    analogWrite(M1_PWM, PWM_VAL);
+    analogWrite(M2_PWM, PWM_VAL);
+    delay(PWM_DELAY);
+  }
+}
+
+/**
+ * Move Right
+*/
+void turn_right()
+{
+  Serial.println("Moving Reverse!");
+  digitalWrite(M1_BRAKE, HIGH);
+  digitalWrite(M2_BRAKE, HIGH);
+  
+  digitalWrite(M1_DIRECTION, LOW);
   digitalWrite(M2_DIRECTION, LOW);
   for (int PWM_VAL = START_OFFSET; PWM_VAL <= POWER; PWM_VAL++)
   {
