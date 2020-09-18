@@ -23,10 +23,13 @@ const int rightZButton2 = 14;
 const int leftZButton1 = 15;
 const int leftZButton2 = 16;
 
+int time_delay = 100;
+
 void setup()
 {
   // put your setup code here, to run once:
   Serial1.begin(115200);
+
   for (int i = 0; i < 17; i++)
     pinMode(i, INPUT);
   pinMode(vibrate, OUTPUT);
@@ -67,96 +70,99 @@ void loop()
   }
 
   //joystick digital buttons
-
   if (digitalRead(leftjButton) == 0)
   {
     Serial1.println("LEFTJ");
-    delay(200);
+    delay(time_delay);
   }
   if (digitalRead(rightjButton) == 0)
   {
     Serial1.println("RIGHTJ");
-    delay(200);
+    delay(time_delay);
   }
 
-  //digital buttons
 
+  //digital buttons
   if (digitalRead(upButton) == 0)
   {
     Serial1.println("UP");
-    delay(200);
+    delay(time_delay);
   }
-  if (digitalRead(downButton) == 0)
+  else if (digitalRead(downButton) == 0)
   {
     Serial1.println("DOWN");
-    delay(200);
+    delay(time_delay);
   }
-  if (digitalRead(leftButton) == 0)
+  else if (digitalRead(leftButton) == 0)
   {
     Serial1.println("LEFT");
-    delay(200);
+    delay(time_delay);
   }
-  if (digitalRead(rightButton) == 0)
+  else if (digitalRead(rightButton) == 0)
   {
     Serial1.println("RIGHT");
-    delay(200);
+    delay(time_delay);
   }
 
   // right buttons
-  if (digitalRead(oneButton) == 0)
+  else if (digitalRead(oneButton) == 0)
   {
     Serial1.println("D1");
-    delay(200);
+    delay(time_delay);
   }
-  if (digitalRead(twoButton) == 0)
+  else if (digitalRead(twoButton) == 0)
   {
     Serial1.println("D2");
-    delay(200);
+    delay(time_delay);
   }
-  if (digitalRead(threeButton) == 0)
+  else if (digitalRead(threeButton) == 0)
   {
     Serial1.println("D3");
-    delay(200);
+    delay(time_delay);
   }
-  if (digitalRead(fourButton) == 0)
+  else if (digitalRead(fourButton) == 0)
   {
     Serial1.println("D4");
-    delay(200);
+    delay(time_delay);
   }
 
-  //menu buttons
-  if (digitalRead(selectButton) == 0)
+  // menu buttons
+  else if (digitalRead(selectButton) == 0)
   {
     Serial1.println("SELECT");
-    delay(200);
+    delay(time_delay);
   }
-  if (digitalRead(startButton) == 0)
+  else if (digitalRead(startButton) == 0)
   {
     Serial1.println("START");
-    delay(200);
+    delay(time_delay);
   }
 
   // trigger buttons
-
-  if (digitalRead(rightZButton1) == 0)
+  else if (digitalRead(rightZButton1) == 0)
   {
     Serial1.println("RIGHTZ-1");
-    delay(200);
+    delay(time_delay);
   }
-  if (digitalRead(rightZButton2) == 0)
+  else if (digitalRead(rightZButton2) == 0)
   {
     Serial1.println("RIGHTZ-2");
-    delay(200);
+    delay(time_delay);
   }
-
-  if (digitalRead(leftZButton1) == 0)
+  else if (digitalRead(leftZButton1) == 0)
   {
     Serial1.println("LEFTZ-1");
-    delay(200);
+    delay(time_delay);
   }
-  if (digitalRead(leftZButton2) == 0)
+  else if (digitalRead(leftZButton2) == 0)
   {
     Serial1.println("LEFTZ-2");
-    delay(200);
+    delay(time_delay);
   }
+  else
+  {
+    Serial1.println("PRESS BUTTON!");
+    delay(time_delay);
+  }
+  
 }
