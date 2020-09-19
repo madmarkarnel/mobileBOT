@@ -15,12 +15,16 @@
 #define POT A0
 #define LED_OUT 13
 
+bool forward_flag = false;
+bool reverse_flag = false;
+bool move_left_flag = false;
+bool move_right_flag = false;
+
 bool cw_direction = false;
 bool ccw_direction = false;
 bool turn_motor = true;
 
-uint8_t in_power = 10;
-String inData;
+uint8_t in_power = 20; // 0-100 ;default = 20%
 
 void setup()
 {
@@ -85,27 +89,27 @@ void read_serial()
   else if (serial_input == "D1")
   {
     Serial.println(serial_input);
-    in_power = 80;
+    in_power = 40;
   }
   else if (serial_input == "D2")
   {
     Serial.println(serial_input);
-    in_power = 160;
+    in_power = 60;
   }
   else if (serial_input == "D3")
   {
     Serial.println(serial_input);
-    in_power = 200;
+    in_power = 80;
   }
   else if (serial_input == "D4")
   {
     Serial.println(serial_input);
-    in_power = 250;
+    in_power = 100;
   }
   else if (serial_input == "LEFTZ-2")
   {
     Serial.println(serial_input);
-    stop_motors();
+    brake_motors();
   }
   else if (serial_input == "LEFTZ-1")
   {
@@ -130,120 +134,129 @@ void read_serial()
   else
   {
     Serial.println(serial_input);
-    stop_motors();
+    brake_motors();
   }
 }
 
-// int power_int(int power)
-// {
+float mapFloat(float value, float fromLow, float fromHigh, float toLow, float toHigh)
+{
+  return (value - fromLow) * (toHigh - toLow) / (fromHigh - fromLow) + toLow;
+}
 
-// }
+int setPWM(int power) //0 to 100
+{
+  int _power = mapFloat(power, 0, 100, 0, 255);
+  if (_power > 255)
+  {
+    _power = 255;
+  }
+  else if (_power < 0)
+  {
+    _power = 0;
+  }
+  return _power;
+}
 
 /**
- * Move reverse
+ * Move Reverse
+ * Motor 2 is delayed
 */
 void reverse()
 {
+  reverse_flag = true;
+  Serial.println("Moving Reverse!");
+  digitalWrite(M1_BRAKE, HIGH);
+  digitalWrite(M2_BRAKE, HIGH);
+
+  digitalWrite(M1_DIRECTION, LOW);
+  digitalWrite(M2_DIRECTION, HIGH);
+  delay(50);
+
+  analogWrite(M2_PWM, setPWM(in_power));
+  delay(50);
+  analogWrite(M1_PWM, setPWM(in_power));
+}
+
+/**
+ * Move Forward
+ * Motor 1 is delayed
+*/
+void forward()
+{
+  forward_flag = true;
   Serial.println("Moving Forward!");
   digitalWrite(M1_BRAKE, HIGH);
   digitalWrite(M2_BRAKE, HIGH);
 
-  digitalWrite(M1_DIRECTION, LOW);
-  digitalWrite(M2_DIRECTION, HIGH);
-
-  analogWrite(M1_PWM, in_power);
-  analogWrite(M2_PWM, in_power);
-  /*
-  delay(50);
-  for (int PWM_VAL = START_OFFSET; PWM_VAL <= POWER; PWM_VAL++)
-  {
-    analogWrite(M1_PWM, PWM_VAL);
-    analogWrite(M2_PWM, PWM_VAL);
-    delay(PWM_DELAY);
-  }
-  */
-}
-
-/**
- * Move forward
-*/
-void forward()
-{
-  Serial.println("Moving Reverse!");
-  digitalWrite(M1_BRAKE, HIGH);
-  digitalWrite(M2_BRAKE, HIGH);
-
   digitalWrite(M2_DIRECTION, LOW);
   digitalWrite(M1_DIRECTION, HIGH);
-
-  analogWrite(M1_PWM, in_power);
-  analogWrite(M2_PWM, in_power);
-  /*
   delay(50);
-  for (int PWM_VAL = START_OFFSET; PWM_VAL <= POWER; PWM_VAL++)
-  {
-    analogWrite(M1_PWM, PWM_VAL);
-    analogWrite(M2_PWM, PWM_VAL);
-    delay(PWM_DELAY);
-  }
-  */
+
+  analogWrite(M1_PWM, setPWM(in_power));
+  delay(50);
+  analogWrite(M2_PWM, setPWM(in_power));
 }
 
 /**
  * Move Left
+ * motor 2 delayed
 */
-void turn_left()
+void turn_right()
 {
-  Serial.println("Moving Reverse!");
+  move_right_flag = true;
+  Serial.println("Moving to the right!");
   digitalWrite(M1_BRAKE, HIGH);
   digitalWrite(M2_BRAKE, HIGH);
 
   digitalWrite(M1_DIRECTION, HIGH);
   digitalWrite(M2_DIRECTION, HIGH);
-
-  analogWrite(M1_PWM, in_power);
-  analogWrite(M2_PWM, in_power);
-  /*
   delay(50);
-  for (int PWM_VAL = START_OFFSET; PWM_VAL <= POWER; PWM_VAL++)
-  {
-    analogWrite(M1_PWM, PWM_VAL);
-    analogWrite(M2_PWM, PWM_VAL);
-    delay(PWM_DELAY);
-  }
-  */
+
+  analogWrite(M1_PWM, setPWM(in_power));
+  delay(50);
+  analogWrite(M2_PWM, setPWM(in_power));
 }
 
 /**
- * Move Right
+ * Move Left
+ * motor 1 delayed
 */
-void turn_right()
+void turn_left()
 {
-  Serial.println("Moving Reverse!");
+  move_left_flag = true;
+  Serial.println("Moving to the left!");
   digitalWrite(M1_BRAKE, HIGH);
   digitalWrite(M2_BRAKE, HIGH);
 
   digitalWrite(M1_DIRECTION, LOW);
   digitalWrite(M2_DIRECTION, LOW);
-
-  analogWrite(M1_PWM, in_power);
-  analogWrite(M2_PWM, in_power);
-  /*
   delay(50);
-  for (int PWM_VAL = START_OFFSET; PWM_VAL <= POWER; PWM_VAL++)
-  {
-    analogWrite(M1_PWM, PWM_VAL);
-    analogWrite(M2_PWM, PWM_VAL);
-    delay(PWM_DELAY);
-  }
-  */
+  
+  analogWrite(M2_PWM, setPWM(in_power));
+  delay(50);
+  analogWrite(M1_PWM, setPWM(in_power));
 }
 
-void stop_motors()
+/**
+ * Break Motor 1 and Motor 2
+*/
+void brake_motors()
 {
   Serial.println("Breaking . . .");
-  digitalWrite(M1_BRAKE, LOW);
-  digitalWrite(M2_BRAKE, LOW);
+  if(forward_flag || move_left_flag)
+  {
+    digitalWrite(M2_BRAKE, LOW);
+    digitalWrite(M1_BRAKE, LOW);
+    forward_flag = false;
+    move_left_flag = false;
+  }
+  if (reverse_flag || move_right_flag)
+  {
+    digitalWrite(M1_BRAKE, LOW);
+    digitalWrite(M2_BRAKE, LOW);
+    reverse_flag = false;
+    move_right_flag = false;
+  }
 }
 
 /**
@@ -292,15 +305,6 @@ void break_motor(int motor_pin, int _direction, int _brake)
     {
       analogWrite(motor_pin, PWM_VALUE);
       delay(10);
-      /*
-      if (PWM_VALUE <= MIN_BRAKE_STOP)
-      {
-        // digitalWrite(motor_pin, LOW);
-        Serial.println(PWM_VALUE);
-        // delay(100);
-        break;
-      }
-      */
     }
     cw_direction = false;
   }
@@ -312,24 +316,12 @@ void break_motor(int motor_pin, int _direction, int _brake)
     {
       analogWrite(motor_pin, PWM_VALUE);
       delay(10);
-      /*
-      if (PWM_VALUE <= MIN_BRAKE_STOP)
-      {
-        // digitalWrite(motor_pin, LOW);
-        Serial.println(PWM_VALUE);
-        // delay(100);
-        break;
-      }
-      */
     }
     ccw_direction = false;
   }
   Serial.print("Braking: ");
   Serial.println(_brake);
   digitalWrite(_brake, LOW);
-  // digitalWrite(LED_OUT, LOW);
-  // delay(500);
-  // digitalWrite(motor_pin, HIGH);
 }
 
 void hard_break(int _brakePin)
@@ -347,6 +339,7 @@ void hard_break(int _brakePin)
 */
 void read_controller()
 {
+  String inData;
   if (Serial.available() > 0)
   {
     char input = Serial.read();
