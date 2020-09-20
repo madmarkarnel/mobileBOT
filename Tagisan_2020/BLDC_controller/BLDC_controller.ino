@@ -1,3 +1,5 @@
+#include <Adafruit_PWMServoDriver.h>
+
 #define M1_BRAKE 32
 #define M1_DIRECTION 22
 #define M1_PWM 8
@@ -14,6 +16,8 @@
 
 #define POT A0
 #define LED_OUT 13
+
+Adafruit_PWMServoDriver pwmServoDriver = Adafruit_PWMServoDriver(0x40);
 
 bool forward_flag = false;
 bool reverse_flag = false;
@@ -35,6 +39,9 @@ void setup()
   pinMode(M2_DIRECTION, OUTPUT);
   pinMode(M1_BRAKE, OUTPUT);
   pinMode(M2_BRAKE, OUTPUT);
+
+  pwmServoDriver.begin();
+  pwmServoDriver.setPWMFreq(50); // 50 Hz
 
   pinMode(LED_OUT, OUTPUT);
   /**Motor Break
@@ -109,11 +116,21 @@ void read_serial()
   else if (serial_input == "LEFTZ-2")
   {
     Serial.println(serial_input);
-    brake_motors();
+    // brake_motors();
   }
   else if (serial_input == "LEFTZ-1")
   {
     Serial.println(serial_input);
+  }
+  else if (serial_input == "RIGHTZ-2")
+  {
+    Serial.println(serial_input);
+    ball_feeder_down();
+  }
+  else if (serial_input == "RIGHTZ-1")
+  {
+    Serial.println(serial_input);
+    ball_feeder_up();
   }
   /*
   else if (serial_input >= "530")
@@ -231,7 +248,7 @@ void turn_left()
   digitalWrite(M1_DIRECTION, LOW);
   digitalWrite(M2_DIRECTION, LOW);
   delay(50);
-  
+
   analogWrite(M2_PWM, setPWM(in_power));
   delay(50);
   analogWrite(M1_PWM, setPWM(in_power));
@@ -243,7 +260,7 @@ void turn_left()
 void brake_motors()
 {
   Serial.println("Breaking . . .");
-  if(forward_flag || move_left_flag)
+  if (forward_flag || move_left_flag)
   {
     digitalWrite(M2_BRAKE, LOW);
     digitalWrite(M1_BRAKE, LOW);
