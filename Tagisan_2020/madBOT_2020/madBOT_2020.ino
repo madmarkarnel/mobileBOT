@@ -45,8 +45,9 @@ int shooter_power = 10;
 void setup()
 {
     Serial.begin(115200);
+    //servo initialization
     pwmServoDriver.begin();
-    pwmServoDriver.setPWMFreq(50); // 50 Hz
+    pwmServoDriver.setPWMFreq(50);
 
     driveRight.setDirection(CW);
     driveLeft.setDirection(CCW);
@@ -100,7 +101,6 @@ void loop()
         {
             in_power = 80;
         }
-
         Serial.println(in_power);
     }
     else if (serial_input == "D2")
@@ -261,6 +261,6 @@ void claw_out()
 
 void claw_in()
 {
-    setPwmSevoDriveServoAngle(pwmServoDriver, SERVO_CLAW_L, 0);
-    setPwmSevoDriveServoAngle(pwmServoDriver, SERVO_CLAW_R, 180 - 0);
+    setPwmSevoDriveServoAngle(pwmServoDriver, SERVO_CLAW_L, 180 - 0);
+    setPwmSevoDriveServoAngle(pwmServoDriver, SERVO_CLAW_R, 0);
 }
