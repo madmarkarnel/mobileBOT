@@ -11,8 +11,14 @@ class ThinkLabBLDC
     public:
         ThinkLabBLDC(int _pinPwm, int _pinDir, int _pinBrake);
 
+        void setMaxPower(float _maxPowerPercent);
+        float getMaxPower();
+
         void setDirection(bool _direction);
         bool getDirection();
+
+        void setSpeed(float _speedPercent);
+        float getSpeed();
 
         void stop();
 
@@ -27,6 +33,9 @@ class ThinkLabBLDC
         
         bool direction = CW;
 
+        float maxPowerPercent = 10;
+        float speedPercent = 0;
+        
         void setPWM(float _dutycycle);
 
         float mapFloat(float value, float fromLow, float fromHigh, float toLow, float toHigh);

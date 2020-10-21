@@ -10,8 +10,40 @@ ThinkLabBLDC::ThinkLabBLDC(int _pinPwm, int _pinDir, int _pinBrake)
     pinMode(pinDir, OUTPUT);
     pinMode(pinBrk, OUTPUT);
 
-    // setSpeed(0.0);
+    setSpeed(0.0);
     // disableMotor();
+}
+
+void ThinkLabBLDC::setMaxPower(float _maxPowerPercent)
+{
+    maxPowerPercent = _maxPowerPercent;
+    if (maxPowerPercent > 100)
+        maxPowerPercent = 100;
+    else if (maxPowerPercent < 0)
+        maxPowerPercent = 0;
+    
+    setSpeed(speedPercent);
+}
+
+float ThinkLabBLDC::getMaxPower()
+{
+    return maxPowerPercent;
+}
+
+void ThinkLabBLDC::setSpeed(float _speedPercent)
+{
+    speedPercent = _speedPercent;
+    if (speedPercent > 100) speedPercent = 100;
+    else if (speedPercent <= 0) speedPercent = 0;
+
+    float dutyCycle = maxPowerPercent * speedPercent / 100;
+
+    setPWM(dutyCycle);
+}
+
+float ThinkLabBLDC::getSpeed()
+{
+    return speedPercent;
 }
 
 void ThinkLabBLDC::setDirection(bool _direction)
