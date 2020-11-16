@@ -39,8 +39,8 @@ Adafruit_PWMServoDriver pwmServoDriver = Adafruit_PWMServoDriver(0x40);
 
 String serial_input;
 
-int in_power = 5;
-int shooter_power = 10;
+int in_power = 20;
+int shooter_power = 20;
 
 void setup()
 {
@@ -48,6 +48,12 @@ void setup()
     //servo initialization
     pwmServoDriver.begin();
     pwmServoDriver.setPWMFreq(50);
+
+    driveRight.setMaxPower(20);
+    driveLeft.setMaxPower(20);
+
+    shooterRight.setMaxPower(20);
+    shooterLeft.setMaxPower(20);
 
     driveRight.setDirection(CW);
     driveLeft.setDirection(CCW);
@@ -66,7 +72,6 @@ void setup()
 
 void loop()
 {
-    //run code forever
     do
     {
         serial_input = Serial.readStringUntil('\r\n');
@@ -102,6 +107,8 @@ void loop()
             in_power = 80;
         }
         Serial.println(in_power);
+        driveRight.setMaxPower(in_power);
+        driveLeft.setMaxPower(in_power);
     }
     else if (serial_input == "D2")
     {
@@ -112,6 +119,8 @@ void loop()
             in_power = 5;
         }
         Serial.println(in_power);
+        driveRight.setMaxPower(in_power);
+        driveLeft.setMaxPower(in_power);
     }
     else if (serial_input == "D3")
     {
@@ -121,6 +130,8 @@ void loop()
         {
             shooter_power = 5;
         }
+        shooterRight.setMaxPower(shooter_power);
+        shooterLeft.setMaxPower(shooter_power);
     }
     else if (serial_input == "D4")
     {
@@ -130,6 +141,8 @@ void loop()
         {
             shooter_power = MAX_PWM;
         }
+        shooterRight.setMaxPower(shooter_power);
+        shooterLeft.setMaxPower(shooter_power);        
     }
     else if (serial_input == "LEFTZ-2")
     {
@@ -174,8 +187,11 @@ void forward()
     driveRight.setDirection(CCW);
     driveLeft.setDirection(CW);
 
-    driveRight.setPWM(in_power);
-    driveLeft.setPWM(in_power);
+    driveRight.setSpeed(100);
+    driveLeft.setSpeed(100);
+
+    // driveRight.setPWM(in_power);
+    // driveLeft.setPWM(in_power);
 }
 
 void reverse()
@@ -183,32 +199,38 @@ void reverse()
     driveRight.setDirection(CW);
     driveLeft.setDirection(CCW);
 
-    driveRight.setPWM(in_power);
-    driveLeft.setPWM(in_power);
+    driveRight.setSpeed(100);
+    driveLeft.setSpeed(100);
+    // driveRight.setPWM(in_power);
+    // driveLeft.setPWM(in_power);
 }
 
 void turn_left()
 {
     //turn_left
-    driveLeft.setDirection(CW);
-    driveLeft.setPWM(in_power);
+    driveLeft.setDirection(CCW);
+    driveLeft.setSpeed(100);
+    // driveLeft.setPWM(in_power);
 }
 
 void turn_right()
 {
     //turn_right
-    driveRight.setDirection(CCW);
-    driveRight.setPWM(in_power);
+    driveRight.setDirection(CW);
+    shooterRight.setSpeed(100);
+    // driveRight.setPWM(in_power);
 }
 
 void spin_shooter()
 {
     //spin_shooter
-    shooterRight.setDirection(CCW);
-    shooterLeft.setDirection(CW);
+    shooterRight.setDirection(CW);
+    shooterLeft.setDirection(CCW);
 
-    shooterRight.setPWM(shooter_power);
-    shooterLeft.setPWM(shooter_power);
+    shooterRight.setSpeed(100);
+    shooterLeft.setSpeed(100);
+    // shooterRight.setPWM(shooter_power);
+    // shooterLeft.setPWM(shooter_power);
 }
 
 void stop_shooter()
