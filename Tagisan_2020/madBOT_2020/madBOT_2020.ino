@@ -49,6 +49,7 @@ void setup()
     pwmServoDriver.begin();
     pwmServoDriver.setPWMFreq(50);
 
+    //BLDC motot initialization
     driveRight.setMaxPower(20);
     driveLeft.setMaxPower(20);
 
@@ -189,9 +190,6 @@ void forward()
 
     driveRight.setSpeed(100);
     driveLeft.setSpeed(100);
-
-    // driveRight.setPWM(in_power);
-    // driveLeft.setPWM(in_power);
 }
 
 void reverse()
@@ -201,36 +199,27 @@ void reverse()
 
     driveRight.setSpeed(100);
     driveLeft.setSpeed(100);
-    // driveRight.setPWM(in_power);
-    // driveLeft.setPWM(in_power);
 }
 
 void turn_left()
 {
-    //turn_left
     driveLeft.setDirection(CCW);
     driveLeft.setSpeed(100);
-    // driveLeft.setPWM(in_power);
 }
 
 void turn_right()
 {
-    //turn_right
     driveRight.setDirection(CW);
     shooterRight.setSpeed(100);
-    // driveRight.setPWM(in_power);
 }
 
 void spin_shooter()
 {
-    //spin_shooter
     shooterRight.setDirection(CW);
     shooterLeft.setDirection(CCW);
 
     shooterRight.setSpeed(100);
     shooterLeft.setSpeed(100);
-    // shooterRight.setPWM(shooter_power);
-    // shooterLeft.setPWM(shooter_power);
 }
 
 void stop_shooter()
@@ -241,9 +230,6 @@ void stop_shooter()
 
 void setPwmSevoDriveServoAngle(Adafruit_PWMServoDriver _pwmServoDriver, int _pinServo, int _angle)
 {
-    /**MG996R calibrated rotation
-    * di kaya ng MG996R ang load ng ball feader
-    */
     const int COUNTER_WIDTH_MIN = 150; // 0 angle
     const int COUNTER_WIDTH_MAX = 470; // 180 angle
 
